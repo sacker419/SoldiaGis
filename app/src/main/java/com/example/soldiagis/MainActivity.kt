@@ -244,7 +244,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                         if (currentIcon != closeIcon) {
                             // 클릭된 마커의 아이콘을 변경
                             clickedMarker.setIcon(closeIcon)
-                            toastMessage = "차단기를 닫았습니다."
+                            toastMessage = "차단기를 닫았습니다11."
                         } else {
                             toastMessage = "차단기가 이미 닫혀있습니다."
                         }
