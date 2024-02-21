@@ -35,6 +35,15 @@
         <meta-data
             android:name="com.naver.maps.map.CLIENT_ID"
             android:value="6zdfe88yxi" />
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MyFirebaseMessagingService"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
