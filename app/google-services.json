@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "49781680755",
+    "project_id": "soldiagis",
+    "storage_bucket": "soldiagis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:49781680755:android:7f42756fa7fb79a594d806",
+        "android_client_info": {
+          "package_name": "com.example.soldiagis"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDz6n0lp-9WUksSUG3tnNnjuhNAh2VSe3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
