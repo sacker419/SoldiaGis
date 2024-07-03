@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             Log.e("MainActivity", "Cursor is null or empty")
         }
+        // sadasd
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
