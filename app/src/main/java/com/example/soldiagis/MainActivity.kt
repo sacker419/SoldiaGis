@@ -11,7 +11,9 @@ import android.database.sqlite.SQLiteDatabase
 import android.graphics.drawable.Icon
 import android.media.RingtoneManager
 import android.os.Build
-import android.os.Build.VERSION_CODES.R
+
+//import android.os.Build.VERSION_CODES.R // 이게 왜 문제임??
+
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
