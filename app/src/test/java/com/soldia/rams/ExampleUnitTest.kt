@@ -1,4 +1,4 @@
-package com.example.soldiagis
+package com.soldia.rams
 
 import org.junit.Test
 

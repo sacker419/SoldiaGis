@@ -1,4 +1,4 @@
-package com.example.soldiagis
+package com.soldia.rams
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

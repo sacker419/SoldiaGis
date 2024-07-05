@@ -1,4 +1,4 @@
-package com.example.soldiagis
+package com.soldia.rams
 
 import android.content.ContentValues
 import android.content.Intent

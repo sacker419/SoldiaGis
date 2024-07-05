@@ -1,63 +1,44 @@
-package com.example.soldiagis
+package com.soldia.rams
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.database.sqlite.SQLiteDatabase
-import android.graphics.drawable.Icon
-import android.media.RingtoneManager
-import android.os.Build
-
-//import android.os.Build.VERSION_CODES.R // 이게 왜 문제임??
-
+//import android.os.Build.VERSION_CODES.R
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.soldiagis.R
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.CameraPosition
 import com.naver.maps.map.MapFragment
 import com.naver.maps.map.NaverMap
 import com.naver.maps.map.OnMapReadyCallback
 import com.naver.maps.map.overlay.Marker
-import com.naver.maps.map.overlay.OverlayImage
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.IOException
-import java.nio.charset.Charset
 import com.naver.maps.map.overlay.Align
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.google.gson.JsonObject
 import com.naver.maps.map.CameraUpdate
 import com.naver.maps.map.LocationTrackingMode
 import com.naver.maps.map.overlay.OverlayImage.fromResource
 import com.naver.maps.map.util.FusedLocationSource
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.io.OutputStream
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.lifecycleScope
-import kotlin.concurrent.thread
-
 import kotlinx.coroutines.*
 import java.net.Socket
-import java.util.concurrent.TimeoutException
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     val openIcon = fromResource(R.drawable.open)
@@ -72,8 +53,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var dbHelper: DBHelper
     lateinit var database: SQLiteDatabase
 
-    var serverIP = "192.168.33.32" // flask ip
-//    var serverIP = "192.168.30.21" // flask ip
+    var serverIP = "127.0.0.1" // flask ip
     var serverPORT = 5001 // flask port
     var tcpPORT = 9001
 
@@ -105,6 +85,32 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             Log.e("MainActivity", "Cursor is null or empty")
         }
 
+        // FCM token send
+        fun sendTokenToServer(token: String) {
+            val client = OkHttpClient()
+            val requestBody = FormBody.Builder()
+                .add("token", token)
+                .build()
+            val request = Request.Builder()
+                .url("http://$serverIP:$serverPORT/register_token")  // 서버의 토큰 등록 엔드포인트
+                .post(requestBody)
+                .build()
+
+            client.newCall(request).enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    Log.e(TAG, "Failed to send token to server", e)
+                }
+
+                override fun onResponse(call: Call, response: Response) {
+                    if (response.isSuccessful) {
+                        Log.d(TAG, "Token sent to server successfully")
+                    } else {
+                        Log.e(TAG, "Failed to send token to server: ${response.code}")
+                    }
+                }
+            })
+        }
+
         FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(TAG, "Fetching FCM registration token failed", task.exception)
@@ -114,6 +120,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             // Get new FCM registration token
             val token = task.result
             Log.d("FCM token", token)
+
+            // 서버로 토큰 전송
+            sendTokenToServer(token)
         })
 
         receiver = object : BroadcastReceiver() {
@@ -122,7 +131,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                 // 여기서 breakerId를 사용하여 처리
                 if (!breakerId.isNullOrEmpty()) {
                     showToast("Received breakerId from FCM: $breakerId")
-                    // 받은 breakerId를 사용하여 처리
                 }
             }
         }
@@ -170,7 +178,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             while (isActive) {
                 fetchDataFromServer()
                 Log.d("DB 불러오기", "DB 불러오기")
-                delay(3000) // 10초 대기
+                delay(3000) // 3초 대기
             }
         }
     }
@@ -312,7 +320,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         val notibreakerId = ClassFCM.breakerId // breakerId 값을 가져옴
 
         Log.d("Main", "breakerId : ${notibreakerId.toString()}")
-//        showToast(notibreakerId.toString())
 
         // 새로운 breakerId 집합 생성
         val newBreakerIds = breakerList.map { it.breakerId }.toSet()
@@ -323,24 +330,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             markers[id]?.map = null  // 지도에서 마커 제거
             markers.remove(id)  // 마커 맵에서 제거
         }
-
-        // breakerList를 순회하며 각각의 마커 추가
-//        breakerList.forEach { breaker ->
-//            // 각각의 마커를 위해 새로운 Marker 객체 생성
-//            val newMarker = Marker()
-//            // setMark 함수 내에서 새로운 Marker 객체 사용
-//            setMark(newMarker, breaker.lat, breaker.lng, 0, breaker.breakerId, breaker.st)
-//            // 각 마커에 대한 클릭 이벤트 처리
-//            newMarker.setOnClickListener {
-//                showMarkerDialog(newMarker, breaker.breakerId, breaker.lat, breaker.lng, breaker.st)
-//                true
-//            }
-//
-//            if (notibreakerId == breaker.breakerId) {
-//                val cameraUpdate = CameraUpdate.scrollTo(LatLng(breaker.lat, breaker.lng))
-//                naverMap.moveCamera(cameraUpdate)
-//            }
-//        }
         breakerList.forEach { breaker ->
             val existingMarker = markers[breaker.breakerId]
             if (existingMarker != null) {
@@ -514,42 +503,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         })
     }
-//    private fun updateServerData(breakerId: String, st: Int) {
-//        // OkHttpClient 설정
-//        val client = OkHttpClient.Builder().build()
-//
-//        // POST 요청 Body 데이터 설정
-//        val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
-//        val json = JSONObject()
-//        json.put("breakerId", breakerId)
-//        json.put("st", st)
-//        json.put("mobile", 1)
-//        val requestBody = RequestBody.create(mediaType, json.toString())
-//
-//        // POST 요청 생성
-//        val request = Request.Builder()
-//            .url("http://$serverIP:$serverPORT/update")
-//            .post(requestBody)
-//            .build()
-//
-//        // 네트워크 요청 실행
-//        client.newCall(request).enqueue(object : Callback {
-//            override fun onFailure(call: Call, e: IOException) {
-//                e.printStackTrace()
-//            }
-//
-//            override fun onResponse(call: Call, response: Response) {
-//                response.use {
-//                    if (!response.isSuccessful) {
-//                        Log.e(TAG, "Failed to update data")
-//                        return
-//                    }
-//                    Log.d(TAG, "Data updated successfully")
-//                    // 원하는 경우 응답을 처리할 수 있음
-//                }
-//            }
-//        })
-//    }
 
     // 반환할 데이터를 위한 데이터 클래스
     data class SentData(val breakerId: String, val st: Int, val mobile: Int)

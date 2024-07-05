@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.soldiagis'
+    namespace 'com.soldia.rams'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.soldiagis"
+        applicationId "com.soldia.rams"
         minSdk 26
         targetSdk 33
         versionCode 1

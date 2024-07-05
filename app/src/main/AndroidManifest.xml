@@ -22,7 +22,7 @@
         android:networkSecurityConfig="@xml/network_security_config">
 
         <activity
-            android:name=".SplashActivity"
+            android:name="com.soldia.rams.SplashActivity"
             android:theme="@style/Theme.Design.Light.NoActionBar"
             android:exported="true">
             <intent-filter>
@@ -31,11 +31,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.soldia.rams.MainActivity"
             android:exported="true" />
 
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.soldia.rams.SettingsActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +47,7 @@
             android:name="com.naver.maps.map.CLIENT_ID"
             android:value="6zdfe88yxi" />
         <service
-            android:name=".MyFirebaseMessagingService"
+            android:name="com.soldia.rams.MyFirebaseMessagingService"
             android:enabled="true"
             android:exported="false"
             android:stopWithTask="false">

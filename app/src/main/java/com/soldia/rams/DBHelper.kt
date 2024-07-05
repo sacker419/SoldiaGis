@@ -1,4 +1,4 @@
-package com.example.soldiagis
+package com.soldia.rams
 
 import android.content.ContentValues
 import android.content.Context
@@ -30,7 +30,7 @@ class DBHelper(
         if (cursor.count == 0) {
             val initialValues = ContentValues()
             initialValues.put("serverIP", "127.0.0.1")
-            initialValues.put("serverPORT", 5002)
+            initialValues.put("serverPORT", 5001)
             initialValues.put("tcpPORT", 9001)
 
             db.insert(tableName, null, initialValues)
